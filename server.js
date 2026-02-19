@@ -9,10 +9,10 @@ app.use(bodyParser.json());
 app.use(cors()); // allow frontend requests
 
 // M-Pesa Sandbox Credentials
-const consumerKey = 'YOUR_CONSUMER_KEY';
-const consumerSecret = 'YOUR_CONSUMER_SECRET';
+const consumerKey = 'tymXU9onwWV8Y66aXlGskcNLrCrMFAZAPmEP3UraIinFKFJf';
+const consumerSecret = 'AlEKxiPGPiBiwod8EUGMKzmjAgMAYAvJRj5lk1cL6mDTNuMUxdHIinijiud2GRp7';
 const shortCode = '174379'; // Sandbox Business Shortcode
-const passkey = 'YOUR_PASSKEY';
+const passkey = 'bfb279f9aa9bdbcf158e97ddf7e8f6b';
 
 // Generate OAuth token
 async function getAccessToken() {
@@ -23,7 +23,17 @@ async function getAccessToken() {
     );
     return data.access_token;
 }
-
+app.get('/test', async (req, res) => {
+    try {
+        const token = await getAccessToken();
+        res.json({ token });
+    } catch (err) {
+        console.error("OAuth Error:", err.message);
+        res.json({
+            error: err.response?.data || err.message
+        });
+    }
+});
 // STK Push Endpoint
 app.post('/pay', async (req, res) => {
     const { phone, amount } = req.body;
@@ -42,7 +52,7 @@ app.post('/pay', async (req, res) => {
             PartyA: phone,
             PartyB: shortCode,
             PhoneNumber: phone,
-            CallBackURL: "https://yourdomain.com/callback", // sandbox demo, can be localhost
+            CallBackURL: "https://mydomain.com/callback", // sandbox demo, can be localhost
             AccountReference: "RaphShoes",
             TransactionDesc: "Shoe Purchase"
         };
@@ -55,7 +65,10 @@ app.post('/pay', async (req, res) => {
 
         res.json(response.data);
     } catch (err) {
-        res.status(500).json(err.response.data);
+        console.error("FULL ERROR:", err.response?.data || err.message);
+        res.status(500).json(
+            err.response?.data || { error: err.message }
+        );
     }
 });
 

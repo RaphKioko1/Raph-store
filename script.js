@@ -1,4 +1,3 @@
-
 const products = [
     {
         id: 1,
@@ -21,14 +20,17 @@ const products = [
 ];
 
 let cart = [];
+let uploadedImage = null; // store uploaded image for new product
 
+// ----------------- Load Products -----------------
 function loadProducts() {
     const productList = document.getElementById("product-list");
+    productList.innerHTML = ""; // clear before reloading
 
     products.forEach(product => {
         productList.innerHTML += `
             <div class="product">
-                <img src="${product.image}" alt="${product.name}">
+                <img src="${product.image}" alt="${product.name}" style="max-width:150px;">
                 <h3>${product.name}</h3>
                 <p>KES ${product.price}</p>
                 <button onclick="addToCart(${product.id})">Add to Cart</button>
@@ -37,6 +39,7 @@ function loadProducts() {
     });
 }
 
+// ----------------- Cart Functions -----------------
 function addToCart(id) {
     const product = products.find(p => p.id === id);
     cart.push(product);
@@ -55,7 +58,7 @@ function updateCart() {
         total += item.price;
         cartItems.innerHTML += `
             <li>
-                ${item.name} - $${item.price}
+                ${item.name} - KES ${item.price}
                 <button onclick="removeFromCart(${index})">X</button>
             </li>
         `;
@@ -81,18 +84,15 @@ function checkout() {
     updateCart();
 }
 
-loadProducts();
-
 async function payWithMpesa() {
     if(cart.length === 0){
         alert("Your cart is empty!");
         return;
     }
 
-    const phone = prompt("Enter your phone number (format 2547XXXXXXXX):");
+    const phone = prompt("Enter your phone number (format 254795012504):");
     if(!phone) return;
 
-    // Calculate total
     let total = cart.reduce((sum, item) => sum + item.price, 0);
 
     try {
@@ -111,4 +111,52 @@ async function payWithMpesa() {
     }
 }
 
+function goHome() {
+    window.location.href = "index.html";
+}
 
+// ----------------- Add Product with Image Upload -----------------
+const uploadInput = document.getElementById("image-upload");
+const previewDiv = document.getElementById("image-preview");
+
+uploadInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        uploadedImage = e.target.result;
+        previewDiv.innerHTML = `<img src="${uploadedImage}" alt="Uploaded Image" style="max-width:150px;">`;
+    }
+    reader.readAsDataURL(file);
+});
+
+document.getElementById("add-product-btn").addEventListener("click", () => {
+    const name = document.getElementById("new-product-name").value;
+    const price = parseInt(document.getElementById("new-product-price").value);
+
+    if (!name || !price || !uploadedImage) {
+        alert("Please provide name, price, and image!");
+        return;
+    }
+
+    const newProduct = {
+        id: products.length + 1,
+        name,
+        price,
+        image: uploadedImage
+    };
+
+    products.push(newProduct);
+
+    // Clear inputs
+    document.getElementById("new-product-name").value = "";
+    document.getElementById("new-product-price").value = "";
+    uploadedImage = null;
+    previewDiv.innerHTML = "";
+
+    loadProducts(); // reload products to show the new one
+});
+
+// ----------------- Initial Load -----------------
+loadProducts();
