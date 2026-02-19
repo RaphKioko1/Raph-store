@@ -1,3 +1,18 @@
+
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyCHzAx6LhriDfF6KbMsXgRVCLMDdxLXMZY",
+  authDomain: "raph-store.firebaseapp.com",
+  projectId: "raph-store",
+  storageBucket: "raph-store.appspot.com",
+  messagingSenderId: "267918696984",
+  appId: "1:267918696984:web:a9309e5fac548d161ed96d",
+  measurementId: "G-T45DZNM2GV"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 const products = [
     {
         id: 1,
